@@ -19,8 +19,11 @@ function StudProxy (customRoute) {
 
       if (chunk[0] === 2 && chunk.length >= 5) {
         // IPv4
-        var ip = chunk.readInt8(1) +'.'+ chunk.readInt8(2) +'.'+ chunk.readInt8(3) +'.'+ chunk.readInt8(4)
-        self.emit('route', socket, ip, chunk.length > 5 ? chunk.slice(6) : null )
+        var ip = [chunk.readInt8(1), chunk.readInt8(2), chunk.readInt8(3), chunk.readInt8(4)]
+        if (ip[1] < 0) ip[1] = ip[1] + 256
+        if (ip[2] < 0) ip[2] = ip[2] + 256
+        if (ip[3] < 0) ip[3] = ip[3] + 256
+        self.emit('route', socket, ip.join('.'), chunk.length > 5 ? chunk.slice(6) : null )
       }
 
       // TODO: Add IPv6 Support
