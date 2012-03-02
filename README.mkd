@@ -4,13 +4,13 @@
 
 ### Getting Started
 
-Get [stud](https://github.com/bumptech/stud). Run with `--write-ip`, this is required.
+Get [stud](https://github.com/bumptech/stud). Run with `--write-ip`, THIS IS NOT OPTIONAL.
 
 ```javascript
 var s = studproxy()
 s.listen(8000, function () {
   request('https://localhost:8443/', function (e, resp, body) {
-    // Will return a response from the remove host.
+    // Will return a response from a round robin host.
   })
 })
 s.robin([['98.139.127.62', 80]])
@@ -22,7 +22,7 @@ If you need to get your list of round robin hosts from a remote server `stud-pro
 var s = studproxy()
 s.listen(8000, function () {
   request('https://localhost:8443/', function (e, resp, body) {
-    // Will return a response from the remove host.
+    // Will return a response from a round robin host.
   })
 })
 setTimeout(function () {
