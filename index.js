@@ -3,7 +3,6 @@ var net = require('net')
   ;
 
 function StudProxy (customRoute) {
-  console.error(2)
   var self = this
   net.Server.call(self)
   if (customRoute) self.route = customRoute
@@ -81,7 +80,6 @@ StudProxy.prototype.routeRobin = function (socket) {
   var i = this.i
   if (i > this._hosts.length - 1) i = 0
   var host = this._hosts[i]
-  console.error(host)
   var dest = net.connect(host[1], host[0])
   socket.pipe(dest)
   dest.pipe(socket)
@@ -90,6 +88,5 @@ StudProxy.prototype.routeRobin = function (socket) {
 }
 
 module.exports = function (route) {
-  console.error(1)
   return new StudProxy(route)
 }
