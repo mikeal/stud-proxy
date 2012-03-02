@@ -2,7 +2,7 @@
   "author": "Mikeal Rogers <mikeal.rogers@gmail.com> (http://www.mikealrogers.com)",
   "name": "stud-proxy",
   "description": "Round Robin proxy/balancer for the stud TLS terminator",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "repository": {
     "type": "git",
     "url": "git://github.com/mikeal/stud-proxy.git"
