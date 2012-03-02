@@ -23,7 +23,7 @@ function StudProxy (customRoute) {
         if (ip[1] < 0) ip[1] = ip[1] + 256
         if (ip[2] < 0) ip[2] = ip[2] + 256
         if (ip[3] < 0) ip[3] = ip[3] + 256
-        self.emit('route', socket, ip.join('.'), chunk.length > 5 ? chunk.slice(6) : null )
+        self.emit('route', socket, ip.join('.'), chunk.length > 5 ? chunk.slice(5) : null )
       }
 
       // TODO: Add IPv6 Support
