@@ -1,5 +1,6 @@
 var net = require('net')
   , util = require('util')
+  , lru = require('lru-cache')
   ;
 
 function StudProxy (customRoute) {
@@ -41,21 +42,25 @@ function StudProxy (customRoute) {
   })
   self.pending = []
   self.i = 0
+  self.lru = lru({max:10000})
 }
 util.inherits(StudProxy, net.Server)
 
 StudProxy.prototype.robin = function (hosts) {
   this._hosts = hosts
+  this._hostStrings = hosts.map(function (h) { return h.join(':') })
   this.release()
 }
 StudProxy.prototype.release = function () {
   var self = this
   self.pending.forEach(function (socket) {
     var dest = self.routeRobin(socket)
-    socket.buffers.forEach(function (chunk) {
-      dest.write(chunk)
-    })
-    delete socket.buffers
+    if (socket.buffers) {
+      socket.buffers.forEach(function (chunk) {
+        dest.write(chunk)
+      })
+      delete socket.buffers
+    }
     if (socket._error) socket.emit('error', socket._error)
     if (socket._end) dest.end()
   })
@@ -67,26 +72,44 @@ StudProxy.prototype.route = function (socket, ip, chunk) {
     else self.emit('socketError', e, socket)
   })
   if (!this._hosts) {
+    console.error('no hosts.')
     // buffer requests in to memory
-    this.pending.append(socket)
+    this.pending.push(socket)
     socket.buffers = []
     socket._ip = ip
-    if (chunk) socket.buffers.append(chunk)
-    socket.on('data', function (chunk) {socket.buffers.append()})
+    if (chunk) socket.buffers.push(chunk)
+    socket.on('data', function (chunk) {socket.buffers.push(chunk)})
     socket.on('end', function () {socket._end = true})
   } else {
-    var dest = self.routeRobin(socket)
-    if (chunk) socket.write(chunk)
+    var host = self.lru.get(ip)
+    if (!host) {
+      host = self.getRobin()
+      self.lru.set(ip, host)
+    } else {
+      if ( self._hostStrings.indexOf(host.join(':')) === -1 ) {
+        host = self.getRobin()
+        self.lru.set(ip, host)
+      }
+    }
+    var dest = self.routeRobin(socket, host)
+    if (chunk) socket.emit('data', chunk)
   }
 }
-StudProxy.prototype.routeRobin = function (socket) {
+StudProxy.prototype.getRobin = function () {
   var i = this.i
   if (i > this._hosts.length - 1) i = 0
   var host = this._hosts[i]
+  this.i = i + 1
+  return host
+}
+
+StudProxy.prototype.routeRobin = function (socket, ip) {
+  var host = ip || this.getRobin()
   var dest = net.connect(host[1], host[0])
+
   socket.pipe(dest)
   dest.pipe(socket)
-  this.i = i + 1
+    
   return dest
 }
 
