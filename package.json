@@ -9,6 +9,6 @@
   },
   "main": "index.js",
   "dependencies": {
-    "lru-cache": "~2.0.2"
+    "lru-cache": "~4.1.1"
   }
 }
