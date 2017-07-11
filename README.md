@@ -1,5 +1,7 @@
 # stud-proxy 
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/mikeal/stud-proxy.svg)](https://greenkeeper.io/)
+
 ## Round Robin proxy/balancer for the [stud](https://github.com/bumptech/stud) TLS terminator
 
 ### Getting Started
